@@ -14,8 +14,8 @@ jobs:
     steps:
       - name: Set variables
         run: |
-          echo "RELEASE_NAME=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
-          echo "TAG_NAME=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+          echo "RELEASE_NAME=$(date +%Y%m%d%H%M)" >> "$GITHUB_ENV"
+          echo "TAG_NAME=$(date +%Y%m%d%H%M)" >> "$GITHUB_ENV"
 
       - name: Fetch rules
         run: |
@@ -34,7 +34,8 @@ jobs:
 
       - name: Generate private.yaml file
         run: |
-          echo "payload:" > private.yaml
+          echo payload: \
+            - +.neverssl.com > private.yaml
           awk -F ':' '/^full:/ {printf "  - |%s|\n", $2}' private.txt | sed "s/|/'/g" >> private.yaml
           awk -F ':' '/^domain:/ {printf "  - |+.%s|\n", $2}' private.txt | sed "s/|/'/g" >> private.yaml
 
@@ -52,7 +53,7 @@ jobs:
       - name: Move files to publish directory
         run: |
           mkdir -p publish
-          cp *.yaml ./publish/
+          cp ./*.yaml ./publish/
 
       - name: Release and upload assets
         uses: softprops/action-gh-release@v1
@@ -81,6 +82,6 @@ jobs:
       - name: Purge jsdelivr CDN
         run: |
           cd publish || exit 1
-          for file in $(ls); do
+          for file in ./*; do
             curl -i "https://purge.jsdelivr.net/gh/${{ github.repository }}@release/${file}"
           done
