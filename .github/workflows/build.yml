@@ -34,8 +34,8 @@ jobs:
 
       - name: Generate private.yaml file
         run: |
-          echo payload: \
-            - +.neverssl.com > private.yaml
+          echo 'payload:
+            - +.neverssl.com' > private.yaml
           awk -F ':' '/^full:/ {printf "  - |%s|\n", $2}' private.txt | sed "s/|/'/g" >> private.yaml
           awk -F ':' '/^domain:/ {printf "  - |+.%s|\n", $2}' private.txt | sed "s/|/'/g" >> private.yaml
 
